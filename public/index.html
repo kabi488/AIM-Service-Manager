@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AIM Service Manager</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="center">
+    <h1>AIM Service Manager</h1>
+    <p>Simple scaffold. Redirecting...</p>
+    <p><a href="/pages/authentication/login.html">Go to Login</a></p>
+  </main>
+  <script>
+    // Simple redirect depending on session key
+    const loggedIn = localStorage.getItem('aim_user');
+    if (loggedIn) {
+      window.location.href = '/pages/dashboard/admin-dashboard.html';
+    } else {
+      // wait briefly to show page
+      setTimeout(() => window.location.href = '/pages/authentication/login.html', 600);
+    }
+  </script>
+</body>
+</html>

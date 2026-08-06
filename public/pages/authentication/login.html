@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — AIM Service Manager</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main class="center card">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label>Name</label>
+      <input id="name" required />
+      <label>Role</label>
+      <select id="role">
+        <option value="admin">Admin</option>
+        <option value="technician">Technician</option>
+      </select>
+      <button type="submit">Sign in</button>
+    </form>
+  </main>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const role = document.getElementById('role').value;
+      // Very small client-side session for demo
+      localStorage.setItem('aim_user', JSON.stringify({ name, role }));
+      if (role === 'admin') window.location.href = '/pages/dashboard/admin-dashboard.html';
+      else window.location.href = '/pages/dashboard/technician-dashboard.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard — AIM</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>AIM — Admin</h1>
+    <nav>
+      <a href="/">Home</a>
+      <button id="logout">Logout</button>
+    </nav>
+  </header>
+  <main class="container">
+    <section>
+      <h2>Customers</h2>
+      <form id="customerForm">
+        <input id="c_name" placeholder="name" required />
+        <input id="c_email" placeholder="email" />
+        <button type="submit">Add</button>
+      </form>
+      <ul id="customers"></ul>
+    </section>
+
+    <section>
+      <h2>Invoices</h2>
+      <form id="invoiceForm">
+        <select id="inv_customer"></select>
+        <input id="inv_amount" placeholder="amount" type="number" step="0.01" />
+        <button type="submit">Create</button>
+      </form>
+      <ul id="invoices"></ul>
+    </section>
+  </main>
+
+  <script>
+    const api = '/api';
+    const customersEl = document.getElementById('customers');
+    const invoicesEl = document.getElementById('invoices');
+    const invCustomer = document.getElementById('inv_customer');
+
+    function fetchCustomers() {
+      fetch(api + '/customers').then(r => r.json()).then(data => {
+        customersEl.innerHTML = '';
+        invCustomer.innerHTML = '';
+        data.forEach(c => {
+          const li = document.createElement('li');
+          li.textContent = `${c.id} — ${c.name} (${c.email || ''})`;
+          customersEl.appendChild(li);
+
+          const opt = document.createElement('option');
+          opt.value = c.id; opt.textContent = `${c.name}`;
+          invCustomer.appendChild(opt);
+        });
+      });
+    }
+
+    function fetchInvoices() {
+      fetch(api + '/invoices').then(r => r.json()).then(data => {
+        invoicesEl.innerHTML = '';
+        data.forEach(i => {
+          const li = document.createElement('li');
+          li.textContent = `#${i.id} cust:${i.customer_id} amt:${i.amount} status:${i.status}`;
+          invoicesEl.appendChild(li);
+        });
+      });
+    }
+
+    document.getElementById('customerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('c_name').value;
+      const email = document.getElementById('c_email').value;
+      fetch(api + '/customers', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({name,email}) })
+        .then(r => r.json()).then(()=>{ document.getElementById('c_name').value=''; document.getElementById('c_email').value=''; fetchCustomers(); });
+    });
+
+    document.getElementById('invoiceForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const customer_id = invCustomer.value;
+      const amount = parseFloat(document.getElementById('inv_amount').value) || 0;
+      fetch(api + '/invoices', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({customer_id,amount}) })
+        .then(r => r.json()).then(()=>{ document.getElementById('inv_amount').value=''; fetchInvoices(); });
+    });
+
+    document.getElementById('logout').addEventListener('click', ()=>{ localStorage.removeItem('aim_user'); window.location.href='/'; });
+
+    // initial load
+    fetchCustomers();
+    fetchInvoices();
+  </script>
+</body>
+</html>
